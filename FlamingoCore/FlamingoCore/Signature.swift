@@ -13,7 +13,7 @@ public class Signature {
     private let privateKey: Curve25519.Signing.PrivateKey
     
     public init(password: String) throws {
-        let derivedKey = try PKCS5.PBKDF2(password: password.bytes, salt:salt.bytes, iterations: 262_144, keyLength: 32)
+        let derivedKey = try PKCS5.PBKDF2(password: password.bytes, salt:salt.bytes, iterations: /*262_144*/4096, keyLength: 32)
         let pri = try Curve25519.Signing.PrivateKey(rawRepresentation: derivedKey.calculate())
         self.privateKey = pri
     }
@@ -24,5 +24,9 @@ public class Signature {
     
     public func verify(sign: Data, data: Data) ->Bool {
         return self.privateKey.publicKey.isValidSignature(sign, for: data)
+    }
+    
+    public func publicKey() -> Curve25519.Signing.PublicKey {
+        return self.privateKey.publicKey
     }
 }

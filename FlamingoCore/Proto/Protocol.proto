@@ -1,0 +1,49 @@
+syntax = "proto3";
+package protocol;
+
+enum AlgorithmType {
+    AES_128_GCM = 0;
+    AES_256_GCM = 1;
+    CHACHA20_POLY1305 = 2;
+}
+
+message Algorithm{
+    AlgorithmType algorithm_type = 1;
+    float speed = 2;
+}
+
+message HandshakeRequest {
+    bytes public_key_salt = 1;
+    bytes public_key_hash = 2;
+    bytes salted_node_id_hash = 3;
+    bytes public_key_data = 4;
+    repeated Algorithm algorithms = 5;
+    string ip = 6;
+    bytes mac = 7;
+}
+
+message HandshakeResponse {
+    bytes public_key_salt = 1;
+    bytes public_key_hash = 2;
+    bytes salted_node_id_hash = 3;
+    bytes public_key_data = 4;
+    repeated Algorithm algorithms = 5;
+    bytes payload = 6;
+}
+
+message HandshakeMessage {
+    bytes signature = 1;
+    oneof data {
+        HandshakeRequest request = 2;
+        HandshakeResponse response = 3;
+    };
+}
+
+message PeerQueryRequest {
+    string ip = 1;
+}
+
+message PeerQueryResponse {
+    string ip = 1;
+    string addr = 2;
+}

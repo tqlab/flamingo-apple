@@ -5,11 +5,28 @@
 //  Created by Lee on 2024/11/20.
 //
 import CryptoKit
+import Foundation
 
 public enum AlgorithmType: CaseIterable, Hashable {
     case AES_GCM_128
     case AES_GCM_256
     case CHACHA20_POLY1305
+    
+    public func code()->Int {
+        switch self {
+        case .AES_GCM_128:
+            return 0
+        case .AES_GCM_256:
+            return 1
+        case .CHACHA20_POLY1305:
+            return 2
+        }
+    }
+}
+
+public struct Algorithm {
+    var type: AlgorithmType
+    var speed: Float
 }
 
 public enum CryptoError: Error {
@@ -18,14 +35,12 @@ public enum CryptoError: Error {
 
 public class Crypto {
     
-    private let privateKey: Curve25519.KeyAgreement.PrivateKey
     private let algorithmType: AlgorithmType
     /// Peer public key
     private let publicKey: Curve25519.KeyAgreement.PublicKey
     private let symmetricKey: SymmetricKey
     
     init(privateKey: Curve25519.KeyAgreement.PrivateKey, algorithmType: AlgorithmType, publicKey: Data) throws {
-        self.privateKey = privateKey
         self.algorithmType = algorithmType
         
         let peerPublicKey = try Curve25519.KeyAgreement.PublicKey(rawRepresentation: publicKey)
@@ -110,5 +125,29 @@ public class Crypto {
     
     public static func createEcdhKeypair()-> Curve25519.KeyAgreement.PrivateKey {
         return Curve25519.KeyAgreement.PrivateKey()
+    }
+    
+    ///
+    /// 加密算法测速
+    ///
+    public static func testSpeed(algorithmType: AlgorithmType, maxNanoTime: UInt64) throws -> Float {
+        let priKey = Crypto.createEcdhKeypair()
+        let publicKey = Data.random(length: 32)
+        let sender = try Crypto(privateKey: priKey, algorithmType: algorithmType, publicKey: publicKey)
+        let receiver = try Crypto(privateKey: priKey, algorithmType: algorithmType, publicKey: publicKey)
+        let data = Data.random(length: 1024)
+        
+        let start = DispatchTime.now()
+        var iterations = 0
+        while(DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds < maxNanoTime) {
+            for _ in (0 ... 1000) {
+                let e = try sender.encrypt(data: data)
+                let _ = try receiver.decrypt(data: e)
+            }
+            iterations += 2000
+        }
+        let end = DispatchTime.now()
+        let duration = Float(end.uptimeNanoseconds - start.uptimeNanoseconds) / 1_000_000_000.0
+        return (Float(iterations) / Float(duration)) / 1024
     }
 }

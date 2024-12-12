@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		F17BCB242CEDFF290096B1B5 /* FlamingoCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F17BCB192CEDFF290096B1B5 /* FlamingoCore.framework */; };
 		F17BCB382CEE039F0096B1B5 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = F17BCB372CEE039F0096B1B5 /* CryptoSwift */; };
+		F17BCB7B2CF0B6C10096B1B5 /* SwiftProtobuf in Frameworks */ = {isa = PBXBuildFile; productRef = F17BCB7A2CF0B6C10096B1B5 /* SwiftProtobuf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -26,28 +27,20 @@
 		F17BCB232CEDFF290096B1B5 /* FlamingoCoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlamingoCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		F17BCB2B2CEDFF2A0096B1B5 /* Exceptions for "FlamingoCore" folder in "FlamingoCore" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			publicHeaders = (
-				FlamingoCore.h,
-			);
-			target = F17BCB182CEDFF290096B1B5 /* FlamingoCore */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		F17BCB1B2CEDFF290096B1B5 /* FlamingoCore */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				F17BCB2B2CEDFF2A0096B1B5 /* Exceptions for "FlamingoCore" folder in "FlamingoCore" target */,
-			);
 			path = FlamingoCore;
 			sourceTree = "<group>";
 		};
 		F17BCB272CEDFF290096B1B5 /* FlamingoCoreTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = FlamingoCoreTests;
+			sourceTree = "<group>";
+		};
+		F17BCB6C2CF06ACE0096B1B5 /* Proto */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Proto;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -58,6 +51,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F17BCB382CEE039F0096B1B5 /* CryptoSwift in Frameworks */,
+				F17BCB7B2CF0B6C10096B1B5 /* SwiftProtobuf in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,8 +69,10 @@
 		F17BCB0F2CEDFF290096B1B5 = {
 			isa = PBXGroup;
 			children = (
+				F17BCB6C2CF06ACE0096B1B5 /* Proto */,
 				F17BCB1B2CEDFF290096B1B5 /* FlamingoCore */,
 				F17BCB272CEDFF290096B1B5 /* FlamingoCoreTests */,
+				F17BCB792CF0B6C10096B1B5 /* Frameworks */,
 				F17BCB1A2CEDFF290096B1B5 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -88,6 +84,13 @@
 				F17BCB232CEDFF290096B1B5 /* FlamingoCoreTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		F17BCB792CF0B6C10096B1B5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -118,10 +121,12 @@
 			);
 			fileSystemSynchronizedGroups = (
 				F17BCB1B2CEDFF290096B1B5 /* FlamingoCore */,
+				F17BCB6C2CF06ACE0096B1B5 /* Proto */,
 			);
 			name = FlamingoCore;
 			packageProductDependencies = (
 				F17BCB372CEE039F0096B1B5 /* CryptoSwift */,
+				F17BCB7A2CF0B6C10096B1B5 /* SwiftProtobuf */,
 			);
 			productName = FlamingoCore;
 			productReference = F17BCB192CEDFF290096B1B5 /* FlamingoCore.framework */;
@@ -179,6 +184,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				F17BCB362CEE039F0096B1B5 /* XCRemoteSwiftPackageReference "CryptoSwift" */,
+				F17BCB782CF0B6A60096B1B5 /* XCRemoteSwiftPackageReference "swift-protobuf" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F17BCB1A2CEDFF290096B1B5 /* Products */;
@@ -239,9 +245,10 @@
 			buildSettings = {
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
+				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 6L3WYX7NDL;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -265,6 +272,7 @@
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
 				PRODUCT_BUNDLE_IDENTIFIER = net.dighole.FlamingoCore;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
@@ -282,9 +290,10 @@
 			buildSettings = {
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
+				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 6L3WYX7NDL;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -308,6 +317,7 @@
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
 				PRODUCT_BUNDLE_IDENTIFIER = net.dighole.FlamingoCore;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
@@ -525,6 +535,14 @@
 				minimumVersion = 1.8.3;
 			};
 		};
+		F17BCB782CF0B6A60096B1B5 /* XCRemoteSwiftPackageReference "swift-protobuf" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-protobuf.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.28.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -532,6 +550,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F17BCB362CEE039F0096B1B5 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
 			productName = CryptoSwift;
+		};
+		F17BCB7A2CF0B6C10096B1B5 /* SwiftProtobuf */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F17BCB782CF0B6A60096B1B5 /* XCRemoteSwiftPackageReference "swift-protobuf" */;
+			productName = SwiftProtobuf;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
