@@ -26,8 +26,10 @@ message HandshakeResponse {
     bytes public_key_hash = 3;
     bytes public_key_data = 4;
     Algorithm algorithm = 5;
-    string cidr = 6;
-    bytes payload = 7;
+    string gateway = 6;
+    string ip = 7;
+    string cidr = 8;
+    bytes payload = 9;
 }
 
 message HandshakeMessage {
@@ -38,28 +40,38 @@ message HandshakeMessage {
     };
 }
 
-message IpApplyRequest {
+message ApplyIpRequest {
     bytes id = 1;
+    string ip = 2;
 }
 
-message IpApplyResponse {
+message ApplyIpResponse {
     bytes id = 1;
     string ip = 2;
 }
 
 message Ping {
-    int32 ts = 1;
+    bytes id = 1;
+    int32 ts = 2;
 }
 
 message Pong {
-    int32 ts = 1;
+    bytes id = 1;
+    int32 ts = 2;
 }
 
 message PeerQueryRequest {
-    string ip = 1;
+    bytes id = 1;
+    string ip = 2;
 }
 
 message PeerQueryResponse {
-    string ip = 1;
-    string addr = 2;
+    bytes id = 1;
+    string ip = 2;
+    string nat_ip = 3;
+    int32 port = 4;
+}
+
+message Close {
+    bytes id = 1;
 }

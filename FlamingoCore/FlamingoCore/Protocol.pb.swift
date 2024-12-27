@@ -115,6 +115,10 @@ struct Protocol_HandshakeResponse: @unchecked Sendable {
   /// Clears the value of `algorithm`. Subsequent reads from it will return its default value.
   mutating func clearAlgorithm() {self._algorithm = nil}
 
+  var gateway: String = String()
+
+  var ip: String = String()
+
   var cidr: String = String()
 
   var payload: Data = Data()
@@ -162,19 +166,7 @@ struct Protocol_HandshakeMessage: @unchecked Sendable {
   init() {}
 }
 
-struct Protocol_IpApplyRequest: @unchecked Sendable {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  var id: Data = Data()
-
-  var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  init() {}
-}
-
-struct Protocol_IpApplyResponse: @unchecked Sendable {
+struct Protocol_ApplyIpRequest: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -188,34 +180,12 @@ struct Protocol_IpApplyResponse: @unchecked Sendable {
   init() {}
 }
 
-struct Protocol_Ping: Sendable {
+struct Protocol_ApplyIpResponse: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var ts: Int32 = 0
-
-  var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  init() {}
-}
-
-struct Protocol_Pong: Sendable {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  var ts: Int32 = 0
-
-  var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  init() {}
-}
-
-struct Protocol_PeerQueryRequest: Sendable {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
+  var id: Data = Data()
 
   var ip: String = String()
 
@@ -224,14 +194,72 @@ struct Protocol_PeerQueryRequest: Sendable {
   init() {}
 }
 
-struct Protocol_PeerQueryResponse: Sendable {
+struct Protocol_Ping: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
+  var id: Data = Data()
+
+  var ts: Int32 = 0
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct Protocol_Pong: @unchecked Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var id: Data = Data()
+
+  var ts: Int32 = 0
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct Protocol_PeerQueryRequest: @unchecked Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var id: Data = Data()
+
   var ip: String = String()
 
-  var addr: String = String()
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct Protocol_PeerQueryResponse: @unchecked Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var id: Data = Data()
+
+  var ip: String = String()
+
+  var natIp: String = String()
+
+  var port: Int32 = 0
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct Protocol_Close: @unchecked Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var id: Data = Data()
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -352,8 +380,10 @@ extension Protocol_HandshakeResponse: SwiftProtobuf.Message, SwiftProtobuf._Mess
     3: .standard(proto: "public_key_hash"),
     4: .standard(proto: "public_key_data"),
     5: .same(proto: "algorithm"),
-    6: .same(proto: "cidr"),
-    7: .same(proto: "payload"),
+    6: .same(proto: "gateway"),
+    7: .same(proto: "ip"),
+    8: .same(proto: "cidr"),
+    9: .same(proto: "payload"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -367,8 +397,10 @@ extension Protocol_HandshakeResponse: SwiftProtobuf.Message, SwiftProtobuf._Mess
       case 3: try { try decoder.decodeSingularBytesField(value: &self.publicKeyHash) }()
       case 4: try { try decoder.decodeSingularBytesField(value: &self.publicKeyData) }()
       case 5: try { try decoder.decodeSingularMessageField(value: &self._algorithm) }()
-      case 6: try { try decoder.decodeSingularStringField(value: &self.cidr) }()
-      case 7: try { try decoder.decodeSingularBytesField(value: &self.payload) }()
+      case 6: try { try decoder.decodeSingularStringField(value: &self.gateway) }()
+      case 7: try { try decoder.decodeSingularStringField(value: &self.ip) }()
+      case 8: try { try decoder.decodeSingularStringField(value: &self.cidr) }()
+      case 9: try { try decoder.decodeSingularBytesField(value: &self.payload) }()
       default: break
       }
     }
@@ -394,11 +426,17 @@ extension Protocol_HandshakeResponse: SwiftProtobuf.Message, SwiftProtobuf._Mess
     try { if let v = self._algorithm {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
     } }()
+    if !self.gateway.isEmpty {
+      try visitor.visitSingularStringField(value: self.gateway, fieldNumber: 6)
+    }
+    if !self.ip.isEmpty {
+      try visitor.visitSingularStringField(value: self.ip, fieldNumber: 7)
+    }
     if !self.cidr.isEmpty {
-      try visitor.visitSingularStringField(value: self.cidr, fieldNumber: 6)
+      try visitor.visitSingularStringField(value: self.cidr, fieldNumber: 8)
     }
     if !self.payload.isEmpty {
-      try visitor.visitSingularBytesField(value: self.payload, fieldNumber: 7)
+      try visitor.visitSingularBytesField(value: self.payload, fieldNumber: 9)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -409,6 +447,8 @@ extension Protocol_HandshakeResponse: SwiftProtobuf.Message, SwiftProtobuf._Mess
     if lhs.publicKeyHash != rhs.publicKeyHash {return false}
     if lhs.publicKeyData != rhs.publicKeyData {return false}
     if lhs._algorithm != rhs._algorithm {return false}
+    if lhs.gateway != rhs.gateway {return false}
+    if lhs.ip != rhs.ip {return false}
     if lhs.cidr != rhs.cidr {return false}
     if lhs.payload != rhs.payload {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -492,40 +532,8 @@ extension Protocol_HandshakeMessage: SwiftProtobuf.Message, SwiftProtobuf._Messa
   }
 }
 
-extension Protocol_IpApplyRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".IpApplyRequest"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "id"),
-  ]
-
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularBytesField(value: &self.id) }()
-      default: break
-      }
-    }
-  }
-
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.id.isEmpty {
-      try visitor.visitSingularBytesField(value: self.id, fieldNumber: 1)
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
-
-  static func ==(lhs: Protocol_IpApplyRequest, rhs: Protocol_IpApplyRequest) -> Bool {
-    if lhs.id != rhs.id {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
-}
-
-extension Protocol_IpApplyResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".IpApplyResponse"
+extension Protocol_ApplyIpRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".ApplyIpRequest"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "id"),
     2: .same(proto: "ip"),
@@ -554,7 +562,45 @@ extension Protocol_IpApplyResponse: SwiftProtobuf.Message, SwiftProtobuf._Messag
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Protocol_IpApplyResponse, rhs: Protocol_IpApplyResponse) -> Bool {
+  static func ==(lhs: Protocol_ApplyIpRequest, rhs: Protocol_ApplyIpRequest) -> Bool {
+    if lhs.id != rhs.id {return false}
+    if lhs.ip != rhs.ip {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Protocol_ApplyIpResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".ApplyIpResponse"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "id"),
+    2: .same(proto: "ip"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularBytesField(value: &self.id) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.ip) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.id.isEmpty {
+      try visitor.visitSingularBytesField(value: self.id, fieldNumber: 1)
+    }
+    if !self.ip.isEmpty {
+      try visitor.visitSingularStringField(value: self.ip, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Protocol_ApplyIpResponse, rhs: Protocol_ApplyIpResponse) -> Bool {
     if lhs.id != rhs.id {return false}
     if lhs.ip != rhs.ip {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -565,7 +611,8 @@ extension Protocol_IpApplyResponse: SwiftProtobuf.Message, SwiftProtobuf._Messag
 extension Protocol_Ping: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Ping"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "ts"),
+    1: .same(proto: "id"),
+    2: .same(proto: "ts"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -574,20 +621,25 @@ extension Protocol_Ping: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementa
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt32Field(value: &self.ts) }()
+      case 1: try { try decoder.decodeSingularBytesField(value: &self.id) }()
+      case 2: try { try decoder.decodeSingularInt32Field(value: &self.ts) }()
       default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.id.isEmpty {
+      try visitor.visitSingularBytesField(value: self.id, fieldNumber: 1)
+    }
     if self.ts != 0 {
-      try visitor.visitSingularInt32Field(value: self.ts, fieldNumber: 1)
+      try visitor.visitSingularInt32Field(value: self.ts, fieldNumber: 2)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: Protocol_Ping, rhs: Protocol_Ping) -> Bool {
+    if lhs.id != rhs.id {return false}
     if lhs.ts != rhs.ts {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
@@ -597,7 +649,8 @@ extension Protocol_Ping: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementa
 extension Protocol_Pong: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Pong"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "ts"),
+    1: .same(proto: "id"),
+    2: .same(proto: "ts"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -606,20 +659,25 @@ extension Protocol_Pong: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementa
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt32Field(value: &self.ts) }()
+      case 1: try { try decoder.decodeSingularBytesField(value: &self.id) }()
+      case 2: try { try decoder.decodeSingularInt32Field(value: &self.ts) }()
       default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.id.isEmpty {
+      try visitor.visitSingularBytesField(value: self.id, fieldNumber: 1)
+    }
     if self.ts != 0 {
-      try visitor.visitSingularInt32Field(value: self.ts, fieldNumber: 1)
+      try visitor.visitSingularInt32Field(value: self.ts, fieldNumber: 2)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: Protocol_Pong, rhs: Protocol_Pong) -> Bool {
+    if lhs.id != rhs.id {return false}
     if lhs.ts != rhs.ts {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
@@ -629,7 +687,8 @@ extension Protocol_Pong: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementa
 extension Protocol_PeerQueryRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".PeerQueryRequest"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "ip"),
+    1: .same(proto: "id"),
+    2: .same(proto: "ip"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -638,20 +697,25 @@ extension Protocol_PeerQueryRequest: SwiftProtobuf.Message, SwiftProtobuf._Messa
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self.ip) }()
+      case 1: try { try decoder.decodeSingularBytesField(value: &self.id) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.ip) }()
       default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.id.isEmpty {
+      try visitor.visitSingularBytesField(value: self.id, fieldNumber: 1)
+    }
     if !self.ip.isEmpty {
-      try visitor.visitSingularStringField(value: self.ip, fieldNumber: 1)
+      try visitor.visitSingularStringField(value: self.ip, fieldNumber: 2)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: Protocol_PeerQueryRequest, rhs: Protocol_PeerQueryRequest) -> Bool {
+    if lhs.id != rhs.id {return false}
     if lhs.ip != rhs.ip {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
@@ -661,8 +725,10 @@ extension Protocol_PeerQueryRequest: SwiftProtobuf.Message, SwiftProtobuf._Messa
 extension Protocol_PeerQueryResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".PeerQueryResponse"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "ip"),
-    2: .same(proto: "addr"),
+    1: .same(proto: "id"),
+    2: .same(proto: "ip"),
+    3: .standard(proto: "nat_ip"),
+    4: .same(proto: "port"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -671,26 +737,68 @@ extension Protocol_PeerQueryResponse: SwiftProtobuf.Message, SwiftProtobuf._Mess
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self.ip) }()
-      case 2: try { try decoder.decodeSingularStringField(value: &self.addr) }()
+      case 1: try { try decoder.decodeSingularBytesField(value: &self.id) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.ip) }()
+      case 3: try { try decoder.decodeSingularStringField(value: &self.natIp) }()
+      case 4: try { try decoder.decodeSingularInt32Field(value: &self.port) }()
       default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.ip.isEmpty {
-      try visitor.visitSingularStringField(value: self.ip, fieldNumber: 1)
+    if !self.id.isEmpty {
+      try visitor.visitSingularBytesField(value: self.id, fieldNumber: 1)
     }
-    if !self.addr.isEmpty {
-      try visitor.visitSingularStringField(value: self.addr, fieldNumber: 2)
+    if !self.ip.isEmpty {
+      try visitor.visitSingularStringField(value: self.ip, fieldNumber: 2)
+    }
+    if !self.natIp.isEmpty {
+      try visitor.visitSingularStringField(value: self.natIp, fieldNumber: 3)
+    }
+    if self.port != 0 {
+      try visitor.visitSingularInt32Field(value: self.port, fieldNumber: 4)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: Protocol_PeerQueryResponse, rhs: Protocol_PeerQueryResponse) -> Bool {
+    if lhs.id != rhs.id {return false}
     if lhs.ip != rhs.ip {return false}
-    if lhs.addr != rhs.addr {return false}
+    if lhs.natIp != rhs.natIp {return false}
+    if lhs.port != rhs.port {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Protocol_Close: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".Close"
+  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "id"),
+  ]
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularBytesField(value: &self.id) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.id.isEmpty {
+      try visitor.visitSingularBytesField(value: self.id, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Protocol_Close, rhs: Protocol_Close) -> Bool {
+    if lhs.id != rhs.id {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

@@ -34,10 +34,22 @@ class SimpleIpPacket {
             if data.count < 28 {
                 return nil
             }
-            self.source = bytesToIpv6String(
-                bytes: Data(bytes[8..<20]))!
-            self.destation = bytesToIpv6String(
-                bytes: Data(bytes[20..<28]))!
+
+            if let s = bytesToIpv6String(
+                bytes: Data(bytes[8..<20]))
+            {
+                self.source = s
+            } else {
+                return nil
+            }
+            if let d = bytesToIpv6String(
+                bytes: Data(bytes[20..<28]))
+            {
+                self.destation = d
+            } else {
+                return nil
+            }
+
         } else {
             return nil
         }

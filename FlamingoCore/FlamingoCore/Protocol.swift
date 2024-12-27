@@ -23,7 +23,7 @@ class Protocol {
     /// - mac: mac address
     /// - returns: Handshake data
     public static func buildHandshakeRequest(
-        signature: Signature, id: Data, publicKey: Data,
+        signature: Signature, id: PeerId, publicKey: Data,
         algorithms: [Algorithm]
     ) throws -> Data {
         let salt = Data.random(length: 4)
@@ -31,7 +31,7 @@ class Protocol {
             key: signature.publicKey().rawRepresentation, salt: salt)
 
         var request = Protocol_HandshakeRequest()
-        request.id = id
+        request.id = id.id
         request.publicKeyData = publicKey
         request.publicKeyHash = hash
         request.publicKeySalt = salt
@@ -75,7 +75,7 @@ class Protocol {
         }
         return message.response
     }
-    
+
     /// 解析Pong信息
     /// - parameters:
     /// - data: Response Data
@@ -88,40 +88,60 @@ class Protocol {
         return message
     }
 
-    public static func buildPing(crypto: Crypto) throws -> Data {
+    public static func buildPing(crypto: Crypto, id: PeerId) throws -> Data {
         var result = Data()
         result.append(5)
-        
+
         var message = Protocol_Ping()
+        message.id = id.id
         message.ts = Int32(Date().timeIntervalSince1970)
-        let ping = try message.serializedData();
+        let ping = try message.serializedData()
         let pingEncrypt = try crypto.encrypt(data: ping)
         result.append(pingEncrypt)
-        
+
         return result
     }
     
+    
+    public static func buildClose(crypto: Crypto, id: PeerId) throws -> Data {
+        var result = Data()
+        result.append(0xFF)
+
+        var message = Protocol_Close()
+        message.id = id.id
+        let close = try message.serializedData()
+        let closeEncrypt = try crypto.encrypt(data: close)
+        result.append(closeEncrypt)
+
+        return result
+    }
+
     public static func parseApplyIp(crypto: Crypto, data: Data)
-        throws -> Protocol_IpApplyResponse
+        throws -> Protocol_ApplyIpResponse
     {
         let plainData = try crypto.decrypt(data: data)
-        let message = try Protocol_IpApplyResponse(serializedBytes: plainData)
+        let message = try Protocol_ApplyIpResponse(serializedBytes: plainData)
         return message
     }
-    
-    public static func buildApplyIp(crypto: Crypto, id: Data) throws -> Data {
+
+    public static func buildApplyIp(crypto: Crypto, id: PeerId, ip: String?)
+        throws -> Data
+    {
         var result = Data()
         result.append(3)
-        
-        var message = Protocol_IpApplyRequest()
-        message.id = id
-        let ipApply = try message.serializedData();
+
+        var message = Protocol_ApplyIpRequest()
+        message.id = id.id
+        if let ip = ip {
+            message.ip = ip
+        }
+        let ipApply = try message.serializedData()
         let ipApplyEncrypt = try crypto.encrypt(data: ipApply)
         result.append(ipApplyEncrypt)
-        
+
         return result
     }
-    
+
     public static func buildData(crypto: Crypto, data: Data) throws -> Data {
         var result = Data()
         result.append(9)
@@ -130,4 +150,27 @@ class Protocol {
         return result
     }
 
+    public static func buildPeerQuery(crypto: Crypto, id: PeerId, ip: String)
+        throws -> Data
+    {
+        var result = Data()
+        result.append(0x20)
+
+        var message = Protocol_PeerQueryRequest()
+        message.id = id.id
+        message.ip = ip
+        let query = try message.serializedData()
+        let queryEncrypt = try crypto.encrypt(data: query)
+        result.append(queryEncrypt)
+
+        return result
+    }
+
+    public static func parsePeerQuery(crypto: Crypto, data: Data)
+        throws -> Protocol_PeerQueryResponse
+    {
+        let plainData = try crypto.decrypt(data: data)
+        let message = try Protocol_PeerQueryResponse(serializedBytes: plainData)
+        return message
+    }
 }
